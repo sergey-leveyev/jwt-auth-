@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
 
+
 const router = require("./router/index");
 const errorMiddleware = require("./middlewares/error.middleware");
 
@@ -19,7 +20,7 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use("/api", router);
-app.use(errorMiddleware)
+app.use(errorMiddleware);
 
 const start = async () => {
   try {

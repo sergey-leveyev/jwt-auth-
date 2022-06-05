@@ -48,3 +48,57 @@ module.exports.activate = async (activationLink) => {
   user.isActivated = true;
   await user.save();
 };
+
+module.exports.login = async (email, password) => {
+  const user = await UserModel.findOne({ email });
+  if (!user) {
+    throw ApiError.BadRequest("The username or password is incorrect");
+  }
+
+  const isPassEquals = await bcrypt.compare(password, user.password);
+  if (!isPassEquals) {
+    throw ApiError.BadRequest("The username or password is incorrect");
+  }
+  const userDto = new UserDto(user);
+  const tokens = tokenService.generateTokens({ ...userDto });
+
+  await tokenService.saveToken(userDto.id, tokens.refreshToken);
+
+  return {
+    ...tokens,
+    user: userDto,
+  };
+};
+
+module.exports.logout = async (refreshToken) => {
+  const token = await tokenService.removeTokens(refreshToken);
+  return token;
+};
+
+module.exports.refresh = async (refreshToke) => {
+  if (!refreshToke) {
+    throw ApiError.UnauthorizedError();
+  }
+
+  const userData = tokenService.validateRefreshToken(refreshToke);
+  const tokenFromDb = await tokenService.findToken(refreshToke);
+  if (!userData || !tokenFromDb) {
+    throw ApiError.UnauthorizedError();
+  }
+
+  const user = await UserModel.findById(userData.id);
+  const userDto = new UserDto(user);
+  const tokens = tokenService.generateTokens({ ...userDto });
+
+  await tokenService.saveToken(userDto.id, tokens.refreshToken);
+
+  return {
+    ...tokens,
+    user: userDto,
+  };
+};
+
+module.exports.getAllUsers = async () => {
+  const users = await UserModel.find();
+  return users;
+};
