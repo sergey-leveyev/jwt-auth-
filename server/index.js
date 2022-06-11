@@ -5,7 +5,6 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
 
-
 const router = require("./router/index");
 const errorMiddleware = require("./middlewares/error.middleware");
 
@@ -14,9 +13,17 @@ require("dotenv").config();
 const PORT = process.env.PORT || 5000;
 
 const app = express();
+
 app.use(morgan("dev"));
 app.use(cookieParser());
-app.use(cors());
+
+const corsOptions = {
+  origin: process.env.CLIENT_URL,
+  credentials: true,
+  optionSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use("/api", router);
