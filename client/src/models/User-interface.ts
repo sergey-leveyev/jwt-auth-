@@ -1,5 +1,5 @@
 export interface UserInterface {
   email: string;
-  isActive: boolean;
+  isActivated: boolean;
   id: string;
 }

@@ -10,7 +10,7 @@ const smtpTransport = nodemailer.createTransport({
   },
 });
 
-module.exports.sendActivationMail = async (to, link) => {
+module.exports.sendActivationMail = async (to, link, password) => {
   let sendResult = await smtpTransport.sendMail({
     from: "sargey7@gmail.com",
     to,
